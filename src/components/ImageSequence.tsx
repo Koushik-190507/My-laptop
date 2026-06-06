@@ -10,12 +10,13 @@ export default function ImageSequence() {
 
   useEffect(() => {
     // Preload images
+    const basePath = process.env.NODE_ENV === 'production' ? '/My-laptop' : '';
     const loadedImages: HTMLImageElement[] = [];
     let loadedCount = 0;
     for (let i = 1; i <= 240; i++) {
       const img = new window.Image();
       const paddedIndex = i.toString().padStart(3, '0');
-      img.src = `/sequence/ezgif-frame-${paddedIndex}.jpg`;
+      img.src = `${basePath}/sequence/ezgif-frame-${paddedIndex}.jpg`;
       img.onload = () => {
         loadedCount++;
         if (loadedCount === 240) {
