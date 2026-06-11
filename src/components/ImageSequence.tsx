@@ -10,21 +10,31 @@ export default function ImageSequence() {
 
   useEffect(() => {
     // Preload images
-    const basePath = process.env.NODE_ENV === 'production' ? '/My-laptop' : '';
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const loadedImages: HTMLImageElement[] = [];
     let loadedCount = 0;
+    
+    const handleImageLoad = () => {
+      loadedCount++;
+      if (loadedCount === 240) {
+        setImages(loadedImages);
+        // Draw first frame
+        drawFrame(loadedImages[0]);
+      }
+    };
+
     for (let i = 1; i <= 240; i++) {
       const img = new window.Image();
       const paddedIndex = i.toString().padStart(3, '0');
-      img.src = `${basePath}/sequence/ezgif-frame-${paddedIndex}.jpg`;
-      img.onload = () => {
-        loadedCount++;
-        if (loadedCount === 240) {
-          setImages(loadedImages);
-          // Draw first frame
-          drawFrame(loadedImages[0]);
-        }
+      
+      // Always set onload and onerror handlers before setting the src
+      img.onload = handleImageLoad;
+      img.onerror = () => {
+        console.warn(`Failed to load frame: ezgif-frame-${paddedIndex}.jpg`);
+        handleImageLoad(); // Still count it to prevent blocking initialization
       };
+      
+      img.src = `${basePath}/sequence/ezgif-frame-${paddedIndex}.jpg`;
       loadedImages.push(img);
     }
   }, []);
